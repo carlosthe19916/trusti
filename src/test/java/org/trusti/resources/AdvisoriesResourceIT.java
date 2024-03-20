@@ -1,8 +1,8 @@
-package org.acme;
+package org.trusti.resources;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
 @QuarkusIntegrationTest
-class GreetingResourceIT extends GreetingResourceTest {
+class AdvisoriesResourceIT extends AdvisoriesResourceTest {
     // Execute the same tests but in packaged mode.
 }
