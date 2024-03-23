@@ -15,7 +15,9 @@ import org.trusti.mapper.AdvisoryMapper;
 import org.trusti.models.jpa.entity.AdvisoryEntity;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Transactional
 @ApplicationScoped
@@ -26,6 +28,15 @@ public class AdvisoriesResource {
 
     @Inject
     AdvisoryMapper advisoryMapper;
+
+    @GET
+    @Path("/")
+    public RestResponse<List<AdvisoryDto>> advisories() {
+        List<AdvisoryDto> result = AdvisoryEntity.<AdvisoryEntity>listAll()
+                .stream().map(e -> advisoryMapper.toDto(e))
+                .collect(Collectors.toList());
+        return RestResponse.ok(result);
+    }
 
     @POST
     @Path("/csaf")
@@ -54,4 +65,5 @@ public class AdvisoriesResource {
                 .entity(advisoryMapper.toDto(advisoryEntity))
                 .build();
     }
+
 }

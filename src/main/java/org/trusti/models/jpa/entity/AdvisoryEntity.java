@@ -8,13 +8,11 @@ import java.util.Date;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "advisory", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"identifier"})
-})
+@Table(name = "advisory")
 public class AdvisoryEntity extends PanacheEntityBase {
 
     @Id
-    @GeneratedValue(generator = "organization_sequence")
+    @GeneratedValue(generator = "advisory_sequence")
     public Long id;
 
     @NotBlank
