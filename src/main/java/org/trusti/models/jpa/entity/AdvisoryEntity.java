@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.Date;
-import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "advisory")
@@ -23,7 +22,6 @@ public class AdvisoryEntity extends PanacheEntityBase {
     @Column(name = "title")
     public String title;
 
-    @NotBlank
     @Column(name = "severity")
     public String severity;
 
