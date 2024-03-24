@@ -29,4 +29,8 @@ public class AdvisoryEntity extends PanacheEntityBase {
     @Column(name = "release_date")
     public Date releaseDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task")
+    public TaskEntity task;
+
 }
