@@ -41,7 +41,7 @@ public class SourcesResource {
 
         SourceDto result = sourceMapper.toDto(sourceEntity);
         return RestResponse.ResponseBuilder
-                .<SourceDto>create(RestResponse.Status.OK)
+                .<SourceDto>create(RestResponse.Status.CREATED)
                 .entity(result)
                 .build();
     }
@@ -60,4 +60,19 @@ public class SourcesResource {
                 .build();
     }
 
+    @GET
+    @Path("/{sourceId}")
+    public RestResponse<SourceDto> getSourceById(@PathParam("sourceId") Long sourceId) {
+        return SourceEntity.<SourceEntity>findByIdOptional(sourceId)
+                .map(entity -> sourceMapper.toDto(entity))
+                .map(dto -> RestResponse.ResponseBuilder
+                        .<SourceDto>create(RestResponse.Status.OK)
+                        .entity(dto)
+                        .build()
+                )
+                .orElse(RestResponse.ResponseBuilder
+                        .<SourceDto>create(RestResponse.Status.NOT_FOUND)
+                        .build()
+                );
+    }
 }
