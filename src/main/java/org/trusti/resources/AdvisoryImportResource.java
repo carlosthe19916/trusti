@@ -1,5 +1,6 @@
 package org.trusti.resources;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.camel.Exchange;
@@ -12,6 +13,7 @@ import org.trusti.models.jpa.entity.AdvisoryEntity;
 import schemas.csaf.Csaf;
 import schemas.osv.Osv;
 
+@RegisterForReflection(targets = JsonValidationException.class)
 @ApplicationScoped
 public class AdvisoryImportResource extends RouteBuilder {
 
