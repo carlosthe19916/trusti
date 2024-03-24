@@ -12,7 +12,6 @@ import org.trusti.models.jpa.entity.GitDetailsEntity;
 import org.trusti.models.jpa.entity.SourceEntity;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Transactional
 @ApplicationScoped

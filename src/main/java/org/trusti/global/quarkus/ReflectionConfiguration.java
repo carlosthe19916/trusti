@@ -6,8 +6,8 @@ import schemas.cve.v5.CveV5;
 import schemas.cve.v5.tags.AdpTags;
 import schemas.cve.v5.tags.CnaTags;
 import schemas.cve.v5.tags.ReferenceTags;
-import schemas.osv.*;
 import schemas.osv.Package;
+import schemas.osv.*;
 
 @RegisterForReflection(
         serialization = true,
