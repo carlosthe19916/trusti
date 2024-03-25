@@ -51,7 +51,7 @@ public class TasksResource {
 
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.name = "task";
-        taskEntity.state = TaskState.Created;
+        taskEntity.state = TaskState.No_task;
         taskEntity.source = sourceEntity;
         taskEntity.persist();
 
@@ -63,9 +63,25 @@ public class TasksResource {
 
         taskEvent.fire(result);
         return RestResponse.ResponseBuilder
-                .<TaskDto>create(RestResponse.Status.OK)
+                .<TaskDto>create(RestResponse.Status.CREATED)
                 .entity(result)
                 .build();
+    }
+
+    @GET
+    @Path("/{taskId}")
+    public RestResponse<TaskDto> getSourceById(@PathParam("taskId") Long taskId) {
+        return TaskEntity.<TaskEntity>findByIdOptional(taskId)
+                .map(entity -> taskMapper.toDto(entity))
+                .map(dto -> RestResponse.ResponseBuilder
+                        .<TaskDto>create(RestResponse.Status.OK)
+                        .entity(dto)
+                        .build()
+                )
+                .orElse(RestResponse.ResponseBuilder
+                        .<TaskDto>create(RestResponse.Status.NOT_FOUND)
+                        .build()
+                );
     }
 
     @PUT

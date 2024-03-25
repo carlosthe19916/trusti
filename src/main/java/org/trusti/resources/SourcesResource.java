@@ -29,7 +29,6 @@ public class SourcesResource {
         SourceEntity sourceEntity = new SourceEntity();
         sourceEntity.type = dto.type();
         sourceEntity.url = dto.url();
-        sourceEntity.taskImage = dto.taskImage();
 
         if (dto.gitDetails() != null) {
             sourceEntity.gitDetails = new GitDetailsEntity();

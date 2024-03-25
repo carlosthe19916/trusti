@@ -24,6 +24,9 @@ public class K8sRoute extends RouteBuilder {
     @ConfigProperty(name = "trusti.url")
     String trustiUrl;
 
+    @ConfigProperty(name = "trusti.importer.image")
+    String importerImage;
+
     @Override
     public void configure() throws Exception {
         from("direct:create-task")
@@ -47,7 +50,8 @@ public class K8sRoute extends RouteBuilder {
                     exchange.getIn().setHeader(KubernetesConstants.KUBERNETES_POD_SPEC, generatePodSpec(taskDto));
                     exchange.getIn().setHeader(KubernetesConstants.KUBERNETES_POD_NAME, taskDto.name());
                 })
-            .toF("kubernetes-pods:///?operation=" + KubernetesOperations.CREATE_POD_OPERATION);
+            .toF("kubernetes-pods:///?operation=" + KubernetesOperations.CREATE_POD_OPERATION)
+            .bean("K8sBean", "updateTask");
     }
 
     private Map<String, String> generateLabels(TaskDto taskDto) {
@@ -69,7 +73,6 @@ public class K8sRoute extends RouteBuilder {
     }
 
     private PodSpec generatePodSpec(TaskDto taskDto) {
-        String taskImage = taskDto.source().taskImage();
         List<String> args = new ArrayList<>();
         List<EnvVar> envVars = new ArrayList<>();
 
@@ -120,7 +123,7 @@ public class K8sRoute extends RouteBuilder {
                 .withRestartPolicy("Always")
                 .withContainers(new ContainerBuilder()
                         .withName("task")
-                        .withImage(taskImage)
+                        .withImage(importerImage)
                         .withImagePullPolicy("Always")
                         .withEnv(envVars)
                         .withArgs(args)

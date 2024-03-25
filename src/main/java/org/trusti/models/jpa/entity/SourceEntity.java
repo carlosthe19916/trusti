@@ -25,10 +25,6 @@ public class SourceEntity extends PanacheEntityBase {
     @Column(name = "url")
     public String url;
 
-    @NotBlank
-    @Column(name = "task_image")
-    public String taskImage;
-
     @Embedded
     public GitDetailsEntity gitDetails;
 
