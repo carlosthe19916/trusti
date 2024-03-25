@@ -70,35 +70,24 @@ public class K8sRoute extends RouteBuilder {
 
     private PodSpec generatePodSpec(TaskDto taskDto) {
         String taskImage = taskDto.source().taskImage();
+        List<String> args = new ArrayList<>();
         List<EnvVar> envVars = new ArrayList<>();
 
-        envVars.add(new EnvVarBuilder().withName("TRUSTI_URL")
-                .withValue(trustiUrl)
-                .build()
-        );
-        envVars.add(new EnvVarBuilder().withName("TRUSTI_TASK")
-                .withValue(taskDto.id().toString())
-                .build()
-        );
-
-        // Git or Registry
-        envVars.add(new EnvVarBuilder().withName("SOURCE_URL")
-                .withValue(taskDto.source().url())
-                .build()
-        );
+        // Args
         if (taskDto.source().type().equals(SourceType.Git)) {
-            envVars.add(new EnvVarBuilder().withName("OPERATION")
-                    .withValue("git")
-                    .build()
-            );
+            args.add("git");
         } else {
-            envVars.add(new EnvVarBuilder().withName("OPERATION")
-                    .withValue("http")
-                    .build()
-            );
+            args.add("http");
         }
 
+        args.add(taskDto.source().url());
+
+        // Git ENVs
         if (taskDto.source().gitDetails() != null) {
+            envVars.add(new EnvVarBuilder().withName("WORKSPACE")
+                    .withValue(".")
+                    .build()
+            );
             envVars.add(new EnvVarBuilder().withName("GIT_REF")
                     .withValue(taskDto.source().gitDetails().ref())
                     .build()
@@ -108,6 +97,12 @@ public class K8sRoute extends RouteBuilder {
                     .build()
             );
         }
+
+        // TARGET_URL
+        envVars.add(new EnvVarBuilder().withName("TARGET_URL")
+                .withValue(trustiUrl + "/" + taskDto.id() + "/advisories")
+                .build()
+        );
 
         // Tokens
         envVars.add(new EnvVarBuilder().withName("TRUSTI_TOKEN")
@@ -128,6 +123,7 @@ public class K8sRoute extends RouteBuilder {
                         .withImage(taskImage)
                         .withImagePullPolicy("Always")
                         .withEnv(envVars)
+                        .withArgs(args)
                         .withResources(new ResourceRequirementsBuilder()
                                 .withRequests(Map.of(
                                         "cpu", new Quantity("0.5"),

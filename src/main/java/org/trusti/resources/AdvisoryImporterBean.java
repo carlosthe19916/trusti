@@ -7,6 +7,7 @@ import jakarta.inject.Named;
 import jakarta.transaction.Transactional;
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
+import org.apache.camel.Header;
 import org.trusti.models.AdvisoryMetadata;
 import org.trusti.models.jpa.AdvisoryRepository;
 import org.trusti.models.jpa.entity.AdvisoryEntity;
@@ -30,11 +31,11 @@ public class AdvisoryImporterBean {
     AdvisoryRepository advisoryRepository;
 
     @Transactional
-    public void csaf(@Body Csaf csaf, Exchange exchange) {
-        Optional<String> identifier = Optional.of(csaf.getDocument()).map(Document::getTracking).map(Tracking::getId);
-        Optional<String> title = Optional.of(csaf.getDocument()).map(Document::getTitle);
-        Optional<String> aggregateSeverity = Optional.of(csaf.getDocument()).map(Document::getAggregateSeverity).map(AggregateSeverity::getText);
-        Optional<Date> currentReleaseDate = Optional.of(csaf.getDocument()).map(Document::getTracking).map(Tracking::getCurrentReleaseDate);
+    public void csaf(@Body Csaf csaf, @Header("taskId") Long taskId, Exchange exchange) {
+        Optional<String> identifier = Optional.ofNullable(csaf.getDocument()).map(Document::getTracking).map(Tracking::getId);
+        Optional<String> title = Optional.ofNullable(csaf.getDocument()).map(Document::getTitle);
+        Optional<String> aggregateSeverity = Optional.ofNullable(csaf.getDocument()).map(Document::getAggregateSeverity).map(AggregateSeverity::getText);
+        Optional<Date> currentReleaseDate = Optional.ofNullable(csaf.getDocument()).map(Document::getTracking).map(Tracking::getCurrentReleaseDate);
 
         AdvisoryMetadata metadata = new AdvisoryMetadata(
                 identifier.orElse(null),
@@ -43,15 +44,16 @@ public class AdvisoryImporterBean {
                 currentReleaseDate.orElse(null)
         );
 
-        AdvisoryEntity advisoryEntity = advisoryRepository.create(metadata);
+        AdvisoryEntity advisoryEntity = advisoryRepository.create(metadata, taskId);
+
         exchange.getIn().setBody(advisoryEntity);
     }
 
-    public void osv(@Body Osv osv, Exchange exchange) {
-        Optional<String> identifier = Optional.of(osv.getId());
-        Optional<String> title = Optional.of(osv.getSummary());
+    public void osv(@Body Osv osv, @Header("taskId") Long taskId, Exchange exchange) {
+        Optional<String> identifier = Optional.ofNullable(osv.getId());
+        Optional<String> title = Optional.ofNullable(osv.getSummary());
         Optional<String> aggregateSeverity = osv.getSeverity().stream().map(Severity::getScore).findFirst();
-        Optional<Date> currentReleaseDate = Optional.of(osv.getPublished());
+        Optional<Date> currentReleaseDate = Optional.ofNullable(osv.getPublished());
 
         AdvisoryMetadata metadata = new AdvisoryMetadata(
                 identifier.orElse(null),
@@ -60,11 +62,11 @@ public class AdvisoryImporterBean {
                 currentReleaseDate.orElse(null)
         );
 
-        AdvisoryEntity advisoryEntity = advisoryRepository.create(metadata);
+        AdvisoryEntity advisoryEntity = advisoryRepository.create(metadata, taskId);
         exchange.getIn().setBody(advisoryEntity);
     }
 
-    public void cve_v5(@Body CveV5 cveV5, Exchange exchange) {
+    public void cve_v5(@Body CveV5 cveV5, @Header("taskId") Long taskId, Exchange exchange) {
         AdvisoryMetadata metadata = new AdvisoryMetadata(
                 null,
                 null,
@@ -72,7 +74,7 @@ public class AdvisoryImporterBean {
                 null
         );
 
-        AdvisoryEntity advisoryEntity = advisoryRepository.create(metadata);
+        AdvisoryEntity advisoryEntity = advisoryRepository.create(metadata, taskId);
         exchange.getIn().setBody(advisoryEntity);
     }
 }

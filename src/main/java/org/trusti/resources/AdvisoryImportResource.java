@@ -22,7 +22,13 @@ public class AdvisoryImportResource extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+        from("rest:post:tasks/{taskId}/advisories?consumes=application/json&produces=application/json")
+                .to("direct:import-advisory");
+
         from("rest:post:advisories?consumes=application/json&produces=application/json")
+                .to("direct:import-advisory");
+
+        from("direct:import-advisory")
                 .multicast((oldExchange, newExchange) -> {
                     if (newExchange.getIn().getBody() != null) {
                         return newExchange;
