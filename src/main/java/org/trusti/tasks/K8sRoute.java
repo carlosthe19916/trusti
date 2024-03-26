@@ -21,8 +21,8 @@ public class K8sRoute extends RouteBuilder {
     @ConfigProperty(name = "trusti.namespace")
     String namespace;
 
-    @ConfigProperty(name = "trusti.url")
-    String trustiUrl;
+    @ConfigProperty(name = "trusti.domain")
+    String trustiDomain;
 
     @ConfigProperty(name = "trusti.importer.image")
     String importerImage;
@@ -103,7 +103,7 @@ public class K8sRoute extends RouteBuilder {
 
         // TARGET_URL
         envVars.add(new EnvVarBuilder().withName("TARGET_URL")
-                .withValue(trustiUrl + "/" + taskDto.id() + "/advisories")
+                .withValue(trustiDomain + "/tasks/" + taskDto.id() + "/advisories")
                 .build()
         );
 
