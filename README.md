@@ -14,3 +14,9 @@
   - Schema: https://github.com/CVEProject/cve-schema/blob/master/schema/v5.0/CVE_JSON_5.0_schema.json
   - Source: https://github.com/CVEProject/cvelistV5
   - Schema: https://cveproject.github.io/cve-schema/schema/v5.0/docs/
+
+## Deploy to Minikube
+```shell
+eval $(minikube docker-env)
+mvn clean package -Dquarkus.container-image.build=true -Dquarkus.kubernetes.deploy=true -DskipTests
+```

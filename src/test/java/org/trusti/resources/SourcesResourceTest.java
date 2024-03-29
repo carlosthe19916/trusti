@@ -24,7 +24,7 @@ public class SourcesResourceTest {
 
     static SourceDto sourceDto = new SourceDto(
             null,
-            SourceType.Git,
+            SourceType.git,
             "https://github.com/org/repository.git",
             null
     );

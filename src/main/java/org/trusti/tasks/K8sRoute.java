@@ -77,7 +77,7 @@ public class K8sRoute extends RouteBuilder {
         List<EnvVar> envVars = new ArrayList<>();
 
         // Args
-        if (taskDto.source().type().equals(SourceType.Git)) {
+        if (taskDto.source().type().equals(SourceType.git)) {
             args.add("git");
         } else {
             args.add("http");

@@ -27,7 +27,7 @@ public class TasksResourceTest {
 
     static SourceDto sourceDto = new SourceDto(
             null,
-            SourceType.Git,
+            SourceType.git,
             "https://github.com/org/repository.git",
             null
     );
