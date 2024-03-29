@@ -12,6 +12,7 @@ import org.trusti.models.SourceType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @ApplicationScoped
 public class K8sRoute extends RouteBuilder {
@@ -26,6 +27,18 @@ public class K8sRoute extends RouteBuilder {
 
     @ConfigProperty(name = "trusti.importer.image")
     String importerImage;
+
+    @ConfigProperty(name = "trusti.importer.resources.requests.memory")
+    Optional<String> importerResourcesRequestsMemory;
+
+    @ConfigProperty(name = "trusti.importer.resources.requests.cpu")
+    Optional<String> importerResourcesRequestsCpu;
+
+    @ConfigProperty(name = "trusti.importer.resources.limits.memory")
+    Optional<String> importerResourcesLimitsMemory;
+
+    @ConfigProperty(name = "trusti.importer.resources.limits.cpu")
+    Optional<String> importerResourcesLimitsCpu;
 
     @Override
     public void configure() throws Exception {
@@ -129,12 +142,12 @@ public class K8sRoute extends RouteBuilder {
                         .withArgs(args)
                         .withResources(new ResourceRequirementsBuilder()
                                 .withRequests(Map.of(
-                                        "cpu", new Quantity("0.5"),
-                                        "memory", new Quantity("0.5Gi")
+                                        "cpu", new Quantity(importerResourcesRequestsCpu.orElse("0.5")),
+                                        "memory", new Quantity(importerResourcesRequestsMemory.orElse("0.5Gi"))
                                 ))
                                 .withLimits(Map.of(
-                                        "cpu", new Quantity("1"),
-                                        "memory", new Quantity("1Gi")
+                                        "cpu", new Quantity(importerResourcesLimitsCpu.orElse("1")),
+                                        "memory", new Quantity(importerResourcesLimitsMemory.orElse("1Gi"))
                                 ))
                                 .build()
                         )
