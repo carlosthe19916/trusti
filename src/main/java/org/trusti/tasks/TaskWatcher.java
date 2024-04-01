@@ -28,7 +28,7 @@ public class TaskWatcher {
     @Inject
     KubernetesClient kubernetesClient;
 
-    @ConfigProperty(name = "quarkus.kubernetes.namespace")
+    @ConfigProperty(name = "quarkus.kubernetes-client.namespace")
     Optional<String> namespace;
 
     @ConfigProperty(name = "trusti.domain")
