@@ -1,6 +1,5 @@
 package org.trusti.resources;
 
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -11,7 +10,6 @@ import org.trusti.dto.SourceDto;
 import org.trusti.dto.TaskDto;
 import org.trusti.models.SourceType;
 import org.trusti.models.TaskState;
-import org.trusti.setup.K3sResource;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +18,6 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@QuarkusTestResource(K3sResource.class)
 @TestMethodOrder(OrderAnnotation.class)
 @QuarkusTest
 public class TasksResourceTest {
@@ -51,7 +48,7 @@ public class TasksResourceTest {
     @Test
     @Order(2)
     public void createTask() {
-        taskDto =  new TaskDto(
+        taskDto = new TaskDto(
                 null,
                 null,
                 null,

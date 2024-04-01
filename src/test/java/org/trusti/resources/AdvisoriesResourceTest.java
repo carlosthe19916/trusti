@@ -1,13 +1,11 @@
 package org.trusti.resources;
 
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.trusti.setup.K3sResource;
 
 import java.io.InputStream;
 
@@ -15,7 +13,6 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 
-@QuarkusTestResource(K3sResource.class)
 @TestHTTPEndpoint(AdvisoriesResource.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @QuarkusTest
