@@ -125,7 +125,7 @@ public class TaskWatcher {
 
         // TARGET_URL
         envVars.add(new EnvVarBuilder().withName("TARGET_URL")
-                .withValue(trustiDomain + "/tasks/" + taskDto.id() + "/advisories")
+                .withValue(trustiDomain + "/tasks/" + taskDto.id())
                 .build()
         );
 

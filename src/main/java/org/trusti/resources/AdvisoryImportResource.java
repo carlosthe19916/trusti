@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.builder.endpoint.EndpointRouteBuilder;
 import org.apache.camel.component.jsonvalidator.JsonValidationException;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -15,14 +16,14 @@ import schemas.osv.Osv;
 
 @RegisterForReflection(targets = JsonValidationException.class)
 @ApplicationScoped
-public class AdvisoryImportResource extends RouteBuilder {
+public class AdvisoryImportResource extends EndpointRouteBuilder {
 
     @Inject
     AdvisoryMapper advisoryMapper;
 
     @Override
     public void configure() throws Exception {
-        from("rest:post:tasks/{taskId}/advisories?consumes=application/json&produces=application/json")
+        from("rest:post:tasks/{taskId}?consumes=application/json&produces=application/json")
                 .to("direct:import-advisory");
 
         from("rest:post:advisories?consumes=application/json&produces=application/json")

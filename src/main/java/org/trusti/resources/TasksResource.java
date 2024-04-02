@@ -70,13 +70,6 @@ public class TasksResource {
                 .build();
     }
 
-//    @Transactional
-//    @POST
-//    @Path("/")
-//    public RestResponse<List<TaskDto>> listTasks() {
-//
-//    }
-
     @GET
     @Path("/{taskId}")
     public RestResponse<TaskDto> getSourceById(@PathParam("taskId") Long taskId) {
@@ -98,7 +91,18 @@ public class TasksResource {
     public RestResponse<TaskDto> updateTask(@PathParam("taskId") Long taskId, TaskDto taskDto) {
         return TaskEntity.<TaskEntity>findByIdOptional(taskId)
                 .map(taskEntity -> {
-                    taskEntity.state = taskDto.state();
+                    if (taskDto.state() != null) {
+                        taskEntity.state = taskDto.state();
+                    }
+                    if (taskDto.started() != null) {
+                        taskEntity.started = taskDto.started();
+                    }
+                    if (taskDto.terminated() != null) {
+                        taskEntity.terminated = taskDto.terminated();
+                    }
+                    if (taskDto.error() != null) {
+                        taskEntity.error = taskDto.error();
+                    }
 
                     taskEntity.persist();
                     return taskMapper.toDto(taskEntity);
