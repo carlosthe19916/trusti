@@ -3,14 +3,15 @@ package org.trusti.resources;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.trusti.dto.AdvisoryDto;
 import org.trusti.mapper.AdvisoryMapper;
+import org.trusti.models.Page;
+import org.trusti.models.SearchResult;
+import org.trusti.models.SortBy;
+import org.trusti.models.jpa.AdvisoryRepository;
 import org.trusti.models.jpa.entity.AdvisoryEntity;
 
 import java.util.List;
@@ -26,13 +27,33 @@ public class AdvisoriesResource {
     @Inject
     AdvisoryMapper advisoryMapper;
 
+    @Inject
+    AdvisoryRepository advisoryRepository;
+
     @GET
     @Path("/")
-    public RestResponse<List<AdvisoryDto>> advisories() {
-        List<AdvisoryDto> result = AdvisoryEntity.<AdvisoryEntity>listAll()
-                .stream().map(e -> advisoryMapper.toDto(e))
+    public RestResponse<List<AdvisoryDto>> advisories(
+            @QueryParam("q") @DefaultValue("") String query,
+            @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("limit") @DefaultValue("10") Integer limit,
+            @QueryParam("sort_by") @DefaultValue("id:desc") List<String> sortBy
+    ) {
+        Page page = Page.from(offset, limit);
+        List<SortBy> sort = SortBy.getSorts(sortBy, AdvisoryRepository.SORT_BY_FIELDS);
+
+        AdvisoryRepository.Filters filters = new AdvisoryRepository.Filters(null);
+
+        SearchResult<AdvisoryEntity> searchResult = advisoryRepository.list(filters, page, sort);
+
+        List<AdvisoryDto> items = searchResult.list().stream()
+                .map(entity -> advisoryMapper.toDto(entity))
                 .collect(Collectors.toList());
-        return RestResponse.ok(result);
+
+        return RestResponse.ResponseBuilder
+                .<List<AdvisoryDto>>create(RestResponse.Status.OK)
+                .entity(items)
+                .header("X-Total-Count", searchResult.count())
+                .build();
     }
 
 }
