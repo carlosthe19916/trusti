@@ -69,7 +69,7 @@ public class TasksResourceTest {
                 .body(
                         "id", is(notNullValue()),
                         "name", startsWith("task-"),
-                        "state", is(TaskState.No_task.toString()),
+                        "state", is(TaskState.Created.toString()),
                         "source.id", is(notNullValue())
                 ).extract().body().as(TaskDto.class);
 
@@ -83,7 +83,7 @@ public class TasksResourceTest {
                             .statusCode(200)
                             .extract().body().as(TaskDto.class);
 
-                    assertEquals(TaskState.Created, updatedTaskDto.state());
+                    assertEquals(TaskState.Ready, updatedTaskDto.state());
                 });
 
     }

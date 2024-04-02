@@ -52,7 +52,7 @@ public class TasksResource {
 
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.name = "task";
-        taskEntity.state = TaskState.No_task;
+        taskEntity.state = TaskState.Created;
         taskEntity.source = sourceEntity;
         taskEntity.createTime = new Date();
         taskEntity.persist();

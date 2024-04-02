@@ -66,7 +66,7 @@ public class TaskWatcher {
         QuarkusTransaction.begin();
 
         TaskEntity taskEntity = TaskEntity.findById(taskDto.id());
-        taskEntity.state = TaskState.Created;
+        taskEntity.state = TaskState.Ready;
         taskEntity.job = job.getMetadata().getName();
         taskEntity.image = job.getSpec().getTemplate().getSpec().getContainers().stream()
                 .map(Container::getImage)
