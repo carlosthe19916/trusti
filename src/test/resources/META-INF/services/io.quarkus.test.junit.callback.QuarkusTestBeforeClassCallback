@@ -1,1 +1,1 @@
-org.trusti.resources.MyQuarkusTestBeforeEachCallback
+org.trusti.resources.setup.KubernetesClientTestBeforeEachCallback

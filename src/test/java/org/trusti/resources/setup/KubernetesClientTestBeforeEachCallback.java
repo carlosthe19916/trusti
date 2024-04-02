@@ -1,4 +1,4 @@
-package org.trusti.resources;
+package org.trusti.resources.setup;
 
 import io.fabric8.kubernetes.api.model.ServiceAccountBuilder;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -7,7 +7,7 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.quarkus.test.junit.callback.QuarkusTestBeforeClassCallback;
 import org.eclipse.microprofile.config.ConfigProvider;
 
-public class MyQuarkusTestBeforeEachCallback implements QuarkusTestBeforeClassCallback {
+public class KubernetesClientTestBeforeEachCallback implements QuarkusTestBeforeClassCallback {
 
     @Override
     public void beforeClass(Class<?> testClass) {
