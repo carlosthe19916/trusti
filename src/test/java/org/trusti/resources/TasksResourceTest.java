@@ -52,7 +52,13 @@ public class TasksResourceTest {
                 null,
                 null,
                 null,
-                sourceDto
+                sourceDto,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
         );
 
         taskDto = given()

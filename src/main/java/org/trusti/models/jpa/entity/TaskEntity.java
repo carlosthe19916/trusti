@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import org.trusti.models.TaskState;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -29,6 +30,26 @@ public class TaskEntity extends PanacheEntityBase {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "source")
     public SourceEntity source;
+
+    @NotNull
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "create_time")
+    public Date createTime;
+
+    @Column(name = "started")
+    public Date started;
+
+    @Column(name = "terminated")
+    public Date terminated;
+
+    @Column(name = "job")
+    public String job;
+
+    @Column(name = "error")
+    public String error;
+
+    @Column(name = "image")
+    public String image;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL}, orphanRemoval = true, mappedBy = "task")
     public List<AdvisoryEntity> advisories = new ArrayList<>();

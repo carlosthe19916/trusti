@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class TaskWatcher {
@@ -57,15 +58,21 @@ public class TaskWatcher {
 
         Job pod = generateJob(taskDto);
 
-        kubernetesClient.batch().v1().jobs()
+        Job job = kubernetesClient.batch().v1().jobs()
                 .inNamespace(namespace.orElse("default"))
                 .resource(pod)
                 .create();
 
         QuarkusTransaction.begin();
+
         TaskEntity taskEntity = TaskEntity.findById(taskDto.id());
         taskEntity.state = TaskState.Created;
+        taskEntity.job = job.getMetadata().getName();
+        taskEntity.image = job.getSpec().getTemplate().getSpec().getContainers().stream()
+                .map(Container::getImage)
+                .collect(Collectors.joining(","));
         taskEntity.persist();
+
         QuarkusTransaction.commit();
     }
 

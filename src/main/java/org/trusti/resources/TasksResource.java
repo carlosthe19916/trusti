@@ -14,6 +14,7 @@ import org.trusti.models.TaskState;
 import org.trusti.models.jpa.entity.SourceEntity;
 import org.trusti.models.jpa.entity.TaskEntity;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Transactional
@@ -53,6 +54,7 @@ public class TasksResource {
         taskEntity.name = "task";
         taskEntity.state = TaskState.No_task;
         taskEntity.source = sourceEntity;
+        taskEntity.createTime = new Date();
         taskEntity.persist();
 
         taskEntity.name = "task-" + taskEntity.id + "-" + UUID.randomUUID();
@@ -67,6 +69,13 @@ public class TasksResource {
                 .entity(result)
                 .build();
     }
+
+//    @Transactional
+//    @POST
+//    @Path("/")
+//    public RestResponse<List<TaskDto>> listTasks() {
+//
+//    }
 
     @GET
     @Path("/{taskId}")
