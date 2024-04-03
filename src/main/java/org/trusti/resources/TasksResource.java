@@ -1,6 +1,7 @@
 package org.trusti.resources;
 
 import io.quarkus.narayana.jta.QuarkusTransaction;
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
@@ -15,6 +16,7 @@ import org.trusti.models.jpa.entity.SourceEntity;
 import org.trusti.models.jpa.entity.TaskEntity;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Transactional
@@ -66,6 +68,21 @@ public class TasksResource {
         taskEvent.fire(result);
         return RestResponse.ResponseBuilder
                 .<TaskDto>create(RestResponse.Status.CREATED)
+                .entity(result)
+                .build();
+    }
+
+    @Transactional(Transactional.TxType.NEVER)
+    @POST
+    @Path("/")
+    public RestResponse<List<TaskDto>> listTasks() {
+        Sort sort = Sort.by("id", Sort.Direction.Descending);
+        List<TaskDto> result = TaskEntity.<TaskEntity>findAll(sort).list()
+                .stream()
+                .map(entity -> taskMapper.toDto(entity))
+                .toList();
+        return RestResponse.ResponseBuilder
+                .<List<TaskDto>>create(RestResponse.Status.OK)
                 .entity(result)
                 .build();
     }
