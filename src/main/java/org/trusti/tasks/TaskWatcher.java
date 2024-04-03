@@ -5,12 +5,12 @@ import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpecBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.ScalableResource;
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.trusti.dto.TaskDto;
 import org.trusti.models.SourceType;
 import org.trusti.models.TaskState;
 import org.trusti.models.jpa.entity.TaskEntity;
@@ -29,8 +29,8 @@ public class TaskWatcher {
     @Inject
     KubernetesClient kubernetesClient;
 
-    @ConfigProperty(name = "quarkus.kubernetes-client.namespace")
-    Optional<String> namespace;
+    @ConfigProperty(name = "quarkus.kubernetes-client.namespace", defaultValue = "default")
+    String namespace;
 
     @ConfigProperty(name = "trusti.domain")
     String trustiDomain;
@@ -50,22 +50,22 @@ public class TaskWatcher {
     @ConfigProperty(name = "trusti.importer.resources.limits.cpu")
     Optional<String> importerResourcesLimitsCpu;
 
-    public void onEvent(@Observes TaskDto taskDto) {
+    public void onCreatedEvent(@Observes @State(value = TaskState.Created) TaskEntity taskEntity) {
         kubernetesClient.secrets()
-                .inNamespace(namespace.orElse("default"))
-                .resource(generateSecret(taskDto))
+                .inNamespace(namespace)
+                .resource(generateSecret(taskEntity))
                 .create();
 
-        Job pod = generateJob(taskDto);
+        Job pod = generateJob(taskEntity);
 
         Job job = kubernetesClient.batch().v1().jobs()
-                .inNamespace(namespace.orElse("default"))
+                .inNamespace(namespace)
                 .resource(pod)
                 .create();
 
         QuarkusTransaction.begin();
 
-        TaskEntity taskEntity = TaskEntity.findById(taskDto.id());
+        taskEntity = TaskEntity.findById(taskEntity.id);
         taskEntity.state = TaskState.Ready;
         taskEntity.job = job.getMetadata().getName();
         taskEntity.image = job.getSpec().getTemplate().getSpec().getContainers().stream()
@@ -76,56 +76,65 @@ public class TaskWatcher {
         QuarkusTransaction.commit();
     }
 
-    private Map<String, String> generateLabels(TaskDto taskDto) {
+    public void onCanceledEvent(@Observes @State(value = TaskState.Canceled) TaskEntity taskEntity) {
+        ScalableResource<Job> jobResource = kubernetesClient.batch().v1().jobs()
+                .inNamespace(namespace)
+                .withName(taskEntity.job);
+        if (jobResource.get() != null) {
+            jobResource.delete();
+        }
+    }
+
+    private Map<String, String> generateLabels(TaskEntity taskEntity) {
         return Map.of(
                 "app", "trusti",
                 "role", "task",
-                "task", taskDto.id().toString()
+                "task", taskEntity.id.toString()
         );
     }
 
-    private Secret generateSecret(TaskDto taskDto) {
+    private Secret generateSecret(TaskEntity taskEntity) {
         return new SecretBuilder()
                 .withNewMetadata()
-                .withName(taskDto.name())
-                .withLabels(generateLabels(taskDto))
+                .withName(taskEntity.name)
+                .withLabels(generateLabels(taskEntity))
                 .endMetadata()
                 .addToStringData(TOKEN, "123")
                 .build();
     }
 
-    private Job generateJob(TaskDto taskDto) {
+    private Job generateJob(TaskEntity taskEntity) {
         List<String> args = new ArrayList<>();
         List<EnvVar> envVars = new ArrayList<>();
 
         // Args
-        if (taskDto.source().type().equals(SourceType.git)) {
+        if (taskEntity.source.type.equals(SourceType.git)) {
             args.add("git");
         } else {
             args.add("http");
         }
 
-        args.add(taskDto.source().url());
+        args.add(taskEntity.source.url);
 
         // Git ENVs
-        if (taskDto.source().gitDetails() != null) {
+        if (taskEntity.source.gitDetails != null) {
             envVars.add(new EnvVarBuilder().withName("WORKSPACE")
                     .withValue(".")
                     .build()
             );
             envVars.add(new EnvVarBuilder().withName("GIT_REF")
-                    .withValue(taskDto.source().gitDetails().ref())
+                    .withValue(taskEntity.source.gitDetails.ref)
                     .build()
             );
             envVars.add(new EnvVarBuilder().withName("GIT_WORKING_DIRECTORY")
-                    .withValue(taskDto.source().gitDetails().workingDirectory())
+                    .withValue(taskEntity.source.gitDetails.workingDirectory)
                     .build()
             );
         }
 
         // TARGET_URL
         envVars.add(new EnvVarBuilder().withName("TARGET_URL")
-                .withValue(trustiDomain + "/tasks/" + taskDto.id())
+                .withValue(trustiDomain + "/tasks/" + taskEntity.id)
                 .build()
         );
 
@@ -133,7 +142,7 @@ public class TaskWatcher {
         envVars.add(new EnvVarBuilder().withName("TRUSTI_TOKEN")
                 .withNewValueFrom()
                 .withNewSecretKeyRef()
-                .withName(taskDto.name())
+                .withName(taskEntity.name)
                 .withKey(TOKEN)
                 .withOptional(false)
                 .endSecretKeyRef()
@@ -143,8 +152,8 @@ public class TaskWatcher {
 
         return new JobBuilder()
                 .withNewMetadata()
-                .withName(taskDto.name())
-                .withLabels(generateLabels(taskDto))
+                .withName(taskEntity.name)
+                .withLabels(generateLabels(taskEntity))
                 .endMetadata()
                 .withSpec(new JobSpecBuilder()
                         .withBackoffLimit(0)

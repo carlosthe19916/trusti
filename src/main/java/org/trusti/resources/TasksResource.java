@@ -14,6 +14,7 @@ import org.trusti.mapper.TaskMapper;
 import org.trusti.models.TaskState;
 import org.trusti.models.jpa.entity.SourceEntity;
 import org.trusti.models.jpa.entity.TaskEntity;
+import org.trusti.tasks.State;
 
 import java.util.Date;
 import java.util.List;
@@ -30,7 +31,12 @@ public class TasksResource {
     TaskMapper taskMapper;
 
     @Inject
-    Event<TaskDto> taskEvent;
+    @State(TaskState.Created)
+    Event<TaskEntity> taskCreatedEvent;
+
+    @Inject
+    @State(TaskState.Canceled)
+    Event<TaskEntity> taskCanceledEvent;
 
     @Transactional(Transactional.TxType.NEVER)
     @POST
@@ -65,15 +71,15 @@ public class TasksResource {
         TaskDto result = taskMapper.toDto(taskEntity);
         QuarkusTransaction.commit();
 
-        taskEvent.fire(result);
+        taskCreatedEvent.fire(taskEntity);
         return RestResponse.ResponseBuilder
                 .<TaskDto>create(RestResponse.Status.CREATED)
                 .entity(result)
                 .build();
     }
 
-    @Transactional(Transactional.TxType.NEVER)
-    @POST
+    @Transactional
+    @GET
     @Path("/")
     public RestResponse<List<TaskDto>> listTasks() {
         Sort sort = Sort.by("id", Sort.Direction.Descending);
@@ -110,6 +116,10 @@ public class TasksResource {
                 .map(taskEntity -> {
                     if (taskDto.state() != null) {
                         taskEntity.state = taskDto.state();
+
+                        if (taskEntity.state == TaskState.Canceled) {
+                            taskCanceledEvent.fire(taskEntity);
+                        }
                     }
                     if (taskDto.started() != null) {
                         taskEntity.started = taskDto.started();
