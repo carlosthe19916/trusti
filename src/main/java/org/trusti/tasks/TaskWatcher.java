@@ -38,6 +38,9 @@ public class TaskWatcher {
     @ConfigProperty(name = "trusti.importer.image")
     String importerImage;
 
+    @ConfigProperty(name = "trusti.importer.workspace", defaultValue = "/tmp/workspace")
+    String importerWorkspace;
+
     @ConfigProperty(name = "trusti.importer.resources.requests.memory")
     Optional<String> importerResourcesRequestsMemory;
 
@@ -119,7 +122,7 @@ public class TaskWatcher {
         // Git ENVs
         if (taskEntity.source.gitDetails != null) {
             envVars.add(new EnvVarBuilder().withName("WORKSPACE")
-                    .withValue(".")
+                    .withValue(importerWorkspace)
                     .build()
             );
             envVars.add(new EnvVarBuilder().withName("GIT_REF")
