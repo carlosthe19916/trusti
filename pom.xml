@@ -21,6 +21,7 @@
     </properties>
 
     <modules>
-        <module>application</module>
+        <module>server</module>
+        <module>importer</module>
     </modules>
 </project>

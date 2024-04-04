@@ -2,16 +2,18 @@ FROM quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 AS build
 COPY --chown=quarkus:quarkus mvnw /code/mvnw
 COPY --chown=quarkus:quarkus .mvn /code/.mvn
 COPY --chown=quarkus:quarkus pom.xml /code/
-COPY --chown=quarkus:quarkus application/pom.xml /code/application/
+COPY --chown=quarkus:quarkus server/pom.xml /code/server/
+COPY --chown=quarkus:quarkus importer/pom.xml /code/importer/
 USER quarkus
 WORKDIR /code
 RUN ./mvnw -B org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offline
-COPY application/src /code/application/src
-RUN ./mvnw package -Dnative -DskipTests
+COPY server/src /code/server/src
+COPY importer/src /code/importer/src
+RUN ./mvnw package -Dnative -DskipTests -pl server
 
 FROM quay.io/quarkus/quarkus-micro-image:2.0
 WORKDIR /work/
-COPY --from=build /code/application/target/*-runner /work/application
+COPY --from=build /code/server/target/*-runner /work/application
 
 # set up permissions for user `1001`
 RUN chmod 775 /work /work/application \

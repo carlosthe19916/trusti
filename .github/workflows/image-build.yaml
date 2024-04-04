@@ -19,7 +19,18 @@ jobs:
     with:
       registry: "ghcr.io"
       image_name: "${{ github.repository_owner }}/trusti"
-      containerfile: "./Containerfile"
+      containerfile: "./server.Dockerfile"
+      architectures: '[ "amd64", "arm64" ]'
+    secrets:
+      registry_username: ${{ github.actor }}
+      registry_password: ${{ secrets.GITHUB_TOKEN }}
+
+  importer-image-build:
+    uses: carlosthe19916/release-tools/.github/workflows/build-push-images.yaml@main
+    with:
+      registry: "ghcr.io"
+      image_name: "${{ github.repository_owner }}/trusti-importer"
+      containerfile: "./importer.Dockerfile"
       architectures: '[ "amd64", "arm64" ]'
     secrets:
       registry_username: ${{ github.actor }}
