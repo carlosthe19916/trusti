@@ -1,8 +1,8 @@
-package org.trusti.http;
+package ort.trusti.importer.cli.http;
 
 import jakarta.inject.Inject;
 import org.apache.camel.ProducerTemplate;
-import org.trusti.Constants;
+import org.trusti.importer.Constants;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;

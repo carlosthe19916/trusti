@@ -1,4 +1,4 @@
-package org.trusti;
+package org.trusti.importer;
 
 public interface Constants {
     String IMPORTER_TYPE_HEADER = "ImporterType";

@@ -1,4 +1,4 @@
-package org.trusti;
+package org.trusti.importer;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 

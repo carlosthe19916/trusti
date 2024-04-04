@@ -1,8 +1,8 @@
-package org.trusti.git;
+package org.trusti.importer.git;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.endpoint.EndpointRouteBuilder;
-import org.trusti.Constants;
+import org.trusti.importer.Constants;
 
 import java.io.File;
 import java.nio.file.Files;

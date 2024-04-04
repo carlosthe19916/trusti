@@ -23,5 +23,16 @@
     <modules>
         <module>server</module>
         <module>importer</module>
+        <module>importer-cli</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.trusti</groupId>
+                <artifactId>trusti-importer</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

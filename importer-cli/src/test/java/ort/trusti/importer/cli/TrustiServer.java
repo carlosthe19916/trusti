@@ -1,4 +1,4 @@
-package org.trusti;
+package ort.trusti.importer.cli;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;

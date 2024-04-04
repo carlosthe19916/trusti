@@ -1,4 +1,4 @@
-package org.trusti;
+package org.trusti.importer;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.Exchange;
