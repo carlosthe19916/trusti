@@ -19,9 +19,8 @@ jobs:
     with:
       registry: "ghcr.io"
       image_name: "${{ github.repository_owner }}/trusti"
-      containerfile: "./application/Containerfile"
+      containerfile: "./Containerfile"
       architectures: '[ "amd64", "arm64" ]'
-      context: "application"
     secrets:
       registry_username: ${{ github.actor }}
       registry_password: ${{ secrets.GITHUB_TOKEN }}
