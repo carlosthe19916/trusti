@@ -8,9 +8,9 @@ COPY --chown=quarkus:quarkus importer-cli/pom.xml /code/importer-cli/
 USER quarkus
 WORKDIR /code
 RUN ./mvnw -B org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offline
-COPY server/src /code/server/src
-COPY importer/src /code/importer/src
-COPY importer-cli/src /code/importer-cli/src
+COPY server/src/main /code/server/src/main
+COPY importer/src/main /code/importer/src/main
+COPY importer-cli/src/main /code/importer-cli/src/main
 RUN ./mvnw install -DskipTests && ./mvnw package -Dnative -DskipTests -pl server
 
 FROM quay.io/quarkus/quarkus-micro-image:2.0
