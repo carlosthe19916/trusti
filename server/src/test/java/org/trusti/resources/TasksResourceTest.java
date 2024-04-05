@@ -40,7 +40,7 @@ public class TasksResourceTest {
     public void createSource() {
         sourceDto = given()
                 .contentType(ContentType.JSON)
-                .when().body(sourceDto).post("/sources")
+                .when().body(sourceDto).post("/api/sources")
                 .then()
                 .statusCode(201)
                 .body(
@@ -67,7 +67,7 @@ public class TasksResourceTest {
 
         taskDto = given()
                 .contentType(ContentType.JSON)
-                .when().body(taskDto).post("/tasks")
+                .when().body(taskDto).post("/api/tasks")
                 .then()
                 .statusCode(201)
                 .body(
@@ -82,7 +82,7 @@ public class TasksResourceTest {
                 .untilAsserted(() -> {
                     TaskDto updatedTaskDto = given()
                             .contentType(ContentType.JSON)
-                            .when().get("/tasks/" + taskDto.id())
+                            .when().get("/api/tasks/" + taskDto.id())
                             .then()
                             .statusCode(200)
                             .extract().body().as(TaskDto.class);

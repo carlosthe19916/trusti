@@ -4,10 +4,10 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.camel.Exchange;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.builder.endpoint.EndpointRouteBuilder;
 import org.apache.camel.component.jsonvalidator.JsonValidationException;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.trusti.mapper.AdvisoryMapper;
 import org.trusti.models.jpa.entity.AdvisoryEntity;
@@ -21,13 +21,20 @@ public class AdvisoryImportResource extends EndpointRouteBuilder {
     @Inject
     AdvisoryMapper advisoryMapper;
 
+    @ConfigProperty(name = "quarkus.resteasy-reactive.path", defaultValue = "")
+    String apiPath;
+
     @Override
     public void configure() throws Exception {
-        from("rest:post:tasks/{taskId}/advisories?consumes=application/json&produces=application/json")
-                .to("direct:import-advisory");
-
-        from("rest:post:advisories?consumes=application/json&produces=application/json")
-                .to("direct:import-advisory");
+        rest(apiPath)
+                .post("/tasks/{taskId}/advisories")
+                    .consumes("application/json")
+                    .produces("application/json")
+                    .to("direct:import-advisory")
+                .post("/advisories")
+                    .consumes("application/json")
+                    .produces("application/json")
+                    .to("direct:import-advisory");
 
         from("direct:import-advisory")
                 .multicast((oldExchange, newExchange) -> {

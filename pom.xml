@@ -24,6 +24,7 @@
         <module>server</module>
         <module>importer</module>
         <module>importer-cli</module>
+        <module>ui</module>
     </modules>
 
     <dependencyManagement>
