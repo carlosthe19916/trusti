@@ -45,7 +45,7 @@ jobs:
       architectures: '[ "amd64", "arm64", "ppc64le", "s390x" ]'
       extra-args: "--ulimit nofile=4096:4096"
       pre_build_cmd: |
-        sed -i '/RUN npm clean-install/i RUN npm install -g npm@9' Dockerfile
+        sed -i '/RUN npm clean-install/i RUN npm install -g npm@9' ui/Dockerfile
       context: "ui"
     secrets:
       registry_username: ${{ github.actor }}
