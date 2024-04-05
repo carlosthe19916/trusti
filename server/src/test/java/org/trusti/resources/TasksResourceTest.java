@@ -6,6 +6,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.trusti.dto.GitDetailsDto;
 import org.trusti.dto.SourceDto;
 import org.trusti.dto.TaskDto;
 import org.trusti.models.SourceType;
@@ -25,8 +26,11 @@ public class TasksResourceTest {
     static SourceDto sourceDto = new SourceDto(
             null,
             SourceType.git,
-            "https://github.com/org/repository.git",
-            null
+            "https://github.com/actions/checkout.git",
+            new GitDetailsDto(
+                    "1.0.0",
+                    null
+            )
     );
 
     static TaskDto taskDto;
@@ -74,7 +78,7 @@ public class TasksResourceTest {
                 ).extract().body().as(TaskDto.class);
 
         await()
-                .atMost(5, TimeUnit.SECONDS)
+                .atMost(15, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
                     TaskDto updatedTaskDto = given()
                             .contentType(ContentType.JSON)

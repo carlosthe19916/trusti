@@ -23,7 +23,7 @@ public class AdvisoryImportResource extends EndpointRouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        from("rest:post:tasks/{taskId}?consumes=application/json&produces=application/json")
+        from("rest:post:tasks/{taskId}/advisories?consumes=application/json&produces=application/json")
                 .to("direct:import-advisory");
 
         from("rest:post:advisories?consumes=application/json&produces=application/json")

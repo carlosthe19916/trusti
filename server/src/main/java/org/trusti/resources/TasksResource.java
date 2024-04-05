@@ -3,7 +3,6 @@ package org.trusti.resources;
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -12,9 +11,10 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.trusti.dto.TaskDto;
 import org.trusti.mapper.TaskMapper;
 import org.trusti.models.TaskState;
+import org.trusti.models.jpa.TaskRepository;
 import org.trusti.models.jpa.entity.SourceEntity;
 import org.trusti.models.jpa.entity.TaskEntity;
-import org.trusti.tasks.State;
+import org.trusti.scheduler.Scheduler;
 
 import java.util.Date;
 import java.util.List;
@@ -31,12 +31,10 @@ public class TasksResource {
     TaskMapper taskMapper;
 
     @Inject
-    @State(TaskState.Created)
-    Event<TaskEntity> taskCreatedEvent;
+    TaskRepository taskRepository;
 
     @Inject
-    @State(TaskState.Canceled)
-    Event<TaskEntity> taskCanceledEvent;
+    Scheduler scheduler;
 
     @Transactional(Transactional.TxType.NEVER)
     @POST
@@ -71,7 +69,7 @@ public class TasksResource {
         TaskDto result = taskMapper.toDto(taskEntity);
         QuarkusTransaction.commit();
 
-        taskCreatedEvent.fire(taskEntity);
+        scheduler.getInstance().createTask(taskEntity);
         return RestResponse.ResponseBuilder
                 .<TaskDto>create(RestResponse.Status.CREATED)
                 .entity(result)
@@ -114,22 +112,7 @@ public class TasksResource {
     public RestResponse<TaskDto> updateTask(@PathParam("taskId") Long taskId, TaskDto taskDto) {
         return TaskEntity.<TaskEntity>findByIdOptional(taskId)
                 .map(taskEntity -> {
-                    if (taskDto.state() != null) {
-                        taskEntity.state = taskDto.state();
-
-                        if (taskEntity.state == TaskState.Canceled) {
-                            taskCanceledEvent.fire(taskEntity);
-                        }
-                    }
-                    if (taskDto.started() != null) {
-                        taskEntity.started = taskDto.started();
-                    }
-                    if (taskDto.terminated() != null) {
-                        taskEntity.terminated = taskDto.terminated();
-                    }
-                    if (taskDto.error() != null) {
-                        taskEntity.error = taskDto.error();
-                    }
+                    taskRepository.updateFrom(taskEntity, taskDto);
 
                     taskEntity.persist();
                     return taskMapper.toDto(taskEntity);

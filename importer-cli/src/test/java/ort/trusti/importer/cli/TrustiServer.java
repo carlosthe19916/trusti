@@ -20,15 +20,15 @@ public class TrustiServer implements QuarkusTestResourceLifecycleManager {
         );
         server.start();
 
-        server.stubFor(post(urlEqualTo("/advisories"))
+        server.stubFor(post(urlEqualTo("/tasks/1/advisories"))
                 .willReturn(aResponse()
                         .withStatus(201)
                         .withHeader("Content-Type", "application/json")
                 )
         );
-        server.stubFor(put(urlEqualTo("/advisories"))
+        server.stubFor(put(urlEqualTo("/tasks/1"))
                 .willReturn(aResponse()
-                        .withStatus(201)
+                        .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                 )
         );

@@ -2,12 +2,11 @@ package ort.trusti.importer.cli.git;
 
 import jakarta.inject.Inject;
 import org.apache.camel.ProducerTemplate;
-import org.trusti.importer.Constants;
+import org.trusti.importer.ImporterCamelHeaders;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Command(name = "git", mixinStandardHelpOptions = true, description = "Import data from a git repository")
@@ -19,8 +18,11 @@ public class GitCommand implements Runnable {
     @Parameters(paramLabel = "repository", description = "The git repository.")
     String gitRepository;
 
-    @CommandLine.Option(names = {"--target-url", "-tu"}, required = true, defaultValue = "${env:TARGET_URL}", description = "The URL where the files are going to be sent to.")
-    String targetUrl;
+    @CommandLine.Option(names = {"--task-id", "-ti"}, required = true, defaultValue = "${env:TASK_ID}", description = "The Task ID to which this process belongs to.")
+    Long taskId;
+
+    @CommandLine.Option(names = {"--trusti-server-url", "-tsu"}, required = true, defaultValue = "${env:TRUSTI_SERVER_URL}", description = "The URL of Trusti running server.")
+    String trustiServerUrl;
 
     @CommandLine.Option(names = {"--ref", "-r"}, defaultValue = "${env:GIT_REF}", description = "The branch, tag or SHA to checkout")
     String gitRef;
@@ -35,14 +37,14 @@ public class GitCommand implements Runnable {
     public void run() {
         System.out.println("Started ingestion from " + gitRepository);
 
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(Constants.IMPORTER_TYPE_HEADER, "git");
-        headers.put(Constants.IMPORTER_OUTPUT_BASE_URL, targetUrl);
-
-        headers.put(Constants.IMPORTER_GIT_WORKSPACE, workspace);
-        headers.put(Constants.IMPORTER_GIT_REPOSITORY, gitRepository);
-        headers.put(Constants.IMPORTER_GIT_REF, gitRef);
-        headers.put(Constants.IMPORTER_GIT_WORKING_DIRECTORY, gitWorkingDirectory);
+        Map<String, Object> headers = ImporterCamelHeaders.git(
+                taskId,
+                workspace,
+                gitRepository,
+                gitRef,
+                gitWorkingDirectory
+        );
+        headers.put(ImporterCamelHeaders.REMOTE_IMPORTER_TRUSTI_SERVER_URL, trustiServerUrl);
 
         producerTemplate.requestBodyAndHeaders("direct:start-importer", null, headers);
 

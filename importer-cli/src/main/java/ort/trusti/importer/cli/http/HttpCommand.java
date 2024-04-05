@@ -2,7 +2,7 @@ package ort.trusti.importer.cli.http;
 
 import jakarta.inject.Inject;
 import org.apache.camel.ProducerTemplate;
-import org.trusti.importer.Constants;
+import org.trusti.importer.ImporterCamelHeaders;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -18,18 +18,18 @@ public class HttpCommand implements Runnable {
     @Parameters(paramLabel = "serverUrl", description = "The HTTP server where the CSAF files are stored.")
     String serverUrl;
 
-    @CommandLine.Option(names = {"--target-url", "-tu"}, required = true, defaultValue = "${env:TARGET_URL}", description = "The URL where the files are going to be sent to.")
-    String targetUrl;
+    @CommandLine.Option(names = {"--task-id", "-ti"}, required = true, defaultValue = "${env:TASK_ID}", description = "The Task ID to which this process belongs to.")
+    Long taskId;
+
+    @CommandLine.Option(names = {"--trusti-server-url", "-tsu"}, required = true, defaultValue = "${env:TRUSTI_SERVER_URL}", description = "The URL of Trusti running server.")
+    String trustiServerUrl;
 
     @Override
     public void run() {
         System.out.printf("Started ingestion from %s", serverUrl);
 
-        Map<String, Object> headers = Map.of(
-                Constants.IMPORTER_TYPE_HEADER, "http",
-                Constants.IMPORTER_OUTPUT_BASE_URL, targetUrl,
-                Constants.IMPORTER_HTTP_SERVER_URL, serverUrl
-        );
+        Map<String, Object> headers = ImporterCamelHeaders.http(taskId, serverUrl);
+        headers.put(ImporterCamelHeaders.REMOTE_IMPORTER_TRUSTI_SERVER_URL, trustiServerUrl);
 
         producerTemplate.requestBodyAndHeaders("direct:start-importer", null, headers);
 

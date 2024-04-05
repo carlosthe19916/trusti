@@ -5,6 +5,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.endpoint.EndpointRouteBuilder;
 import org.apache.camel.http.base.HttpOperationFailedException;
+import org.trusti.importer.ImporterRoute;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -81,7 +82,7 @@ public class HttpRoute extends EndpointRouteBuilder {
                 .setHeader(Exchange.CONTENT_TYPE, constant("text/plain"))
                 .toD("${body}")
 
-                .to("direct:send-file")
+                .to(ImporterRoute.IMPORT_FILE_ROUTE_ID)
 
                 .onException(HttpOperationFailedException.class)
                     .maximumRedeliveries(2)

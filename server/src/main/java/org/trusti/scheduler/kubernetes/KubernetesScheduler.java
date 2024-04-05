@@ -1,4 +1,4 @@
-package org.trusti.tasks;
+package org.trusti.scheduler.kubernetes;
 
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
@@ -8,12 +8,13 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.ScalableResource;
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.trusti.models.SourceType;
 import org.trusti.models.TaskState;
 import org.trusti.models.jpa.entity.TaskEntity;
+import org.trusti.scheduler.SchedulerProvider;
+import org.trusti.scheduler.SchedulerProviderType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class TaskWatcher {
+@SchedulerProviderType(value = SchedulerProviderType.Type.KUBERNETES)
+public class KubernetesScheduler implements SchedulerProvider {
 
     private static final String TOKEN = "token";
 
@@ -32,25 +34,26 @@ public class TaskWatcher {
     @ConfigProperty(name = "quarkus.kubernetes-client.namespace", defaultValue = "default")
     String namespace;
 
-    @ConfigProperty(name = "trusti.domain")
+    @ConfigProperty(name = "trusti.scheduler.k8s.domain")
     String trustiDomain;
 
-    @ConfigProperty(name = "trusti.importer.image")
+    @ConfigProperty(name = "trusti.scheduler.k8s.importer.image")
     String importerImage;
 
-    @ConfigProperty(name = "trusti.importer.resources.requests.memory")
+    @ConfigProperty(name = "trusti.scheduler.k8s.importer.resources.requests.memory")
     Optional<String> importerResourcesRequestsMemory;
 
-    @ConfigProperty(name = "trusti.importer.resources.requests.cpu")
+    @ConfigProperty(name = "trusti.scheduler.k8s.importer.resources.requests.cpu")
     Optional<String> importerResourcesRequestsCpu;
 
-    @ConfigProperty(name = "trusti.importer.resources.limits.memory")
+    @ConfigProperty(name = "trusti.scheduler.k8s.importer.resources.limits.memory")
     Optional<String> importerResourcesLimitsMemory;
 
-    @ConfigProperty(name = "trusti.importer.resources.limits.cpu")
+    @ConfigProperty(name = "trusti.scheduler.k8s.importer.resources.limits.cpu")
     Optional<String> importerResourcesLimitsCpu;
 
-    public void onCreatedEvent(@Observes @State(value = TaskState.Created) TaskEntity taskEntity) {
+    @Override
+    public void createTask(TaskEntity taskEntity) {
         kubernetesClient.secrets()
                 .inNamespace(namespace)
                 .resource(generateSecret(taskEntity))
@@ -76,7 +79,8 @@ public class TaskWatcher {
         QuarkusTransaction.commit();
     }
 
-    public void onCanceledEvent(@Observes @State(value = TaskState.Canceled) TaskEntity taskEntity) {
+    @Override
+    public void cancelTask(TaskEntity taskEntity) {
         ScalableResource<Job> jobResource = kubernetesClient.batch().v1().jobs()
                 .inNamespace(namespace)
                 .withName(taskEntity.job);

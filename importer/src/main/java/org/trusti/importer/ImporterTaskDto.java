@@ -5,7 +5,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.Date;
 
 @RegisterForReflection
-public record TaskDto(
+public record ImporterTaskDto(
         TaskState state,
         Date started,
         Date terminated,
