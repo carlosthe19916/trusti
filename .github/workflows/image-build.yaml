@@ -25,13 +25,28 @@ jobs:
       registry_username: ${{ github.actor }}
       registry_password: ${{ secrets.GITHUB_TOKEN }}
 
-  importer-image-build:
+  image-build-importer:
     uses: carlosthe19916/release-tools/.github/workflows/build-push-images.yaml@main
     with:
       registry: "ghcr.io"
       image_name: "${{ github.repository_owner }}/trusti-importer"
       containerfile: "./importer.Dockerfile"
       architectures: '[ "amd64", "arm64" ]'
+    secrets:
+      registry_username: ${{ github.actor }}
+      registry_password: ${{ secrets.GITHUB_TOKEN }}
+
+  image-build-ui:
+    uses: carlosthe19916/release-tools/.github/workflows/build-push-images.yaml@main
+    with:
+      registry: "ghcr.io"
+      image_name: "${{ github.repository_owner }}/trusti-ui"
+      containerfile: "./ui/Dockerfile"
+      architectures: '[ "amd64", "arm64", "ppc64le", "s390x" ]'
+      extra-args: "--ulimit nofile=4096:4096"
+      pre_build_cmd: |
+        sed -i '/RUN npm clean-install/i RUN npm install -g npm@9' Dockerfile
+      context: "ui"
     secrets:
       registry_username: ${{ github.actor }}
       registry_password: ${{ secrets.GITHUB_TOKEN }}

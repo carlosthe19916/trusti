@@ -1,0 +1,21 @@
+{
+  "application": {
+    "title": "Trusti",
+    "name": "Trusti UI",
+    "description": "Trusti UI"
+  },
+  "about": {
+    "displayName": "Trusti",
+    "imageSrc": "<%= brandingRoot %>/images/masthead-logo.svg",
+    "documentationUrl": "https://trusti.io/"
+  },
+  "masthead": {
+    "leftBrand": {
+      "src": "<%= brandingRoot %>/images/masthead-logo.svg",
+      "alt": "brand",
+      "height": "40px"
+    },
+    "leftTitle": null,
+    "rightBrand": null
+  }
+}
