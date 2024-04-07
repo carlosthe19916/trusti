@@ -1,7 +1,10 @@
 package org.trusti.ui;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import java.util.Optional;
 
+@RegisterForReflection
 public record BrandingStrings(
         Application application,
         About about,

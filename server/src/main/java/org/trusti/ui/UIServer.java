@@ -3,6 +3,7 @@ package org.trusti.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,6 +16,7 @@ import java.io.PrintWriter;
 import java.util.Base64;
 import java.util.Optional;
 
+@RegisterForReflection
 @WebServlet("/")
 public class UIServer extends HttpServlet {
 

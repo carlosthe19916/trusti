@@ -1,5 +1,8 @@
 package org.trusti.ui;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public record UiEnv(
         String NODE_ENV,
         String VERSION,

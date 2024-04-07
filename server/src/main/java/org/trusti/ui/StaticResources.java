@@ -2,10 +2,12 @@ package org.trusti.ui;
 
 import io.quarkus.qute.EngineBuilder;
 import io.quarkus.runtime.StartupEvent;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 import jakarta.enterprise.event.Observes;
 
+@RegisterForReflection
 public class StaticResources {
 
     void installRoute(@Observes StartupEvent startupEvent, Router router) {

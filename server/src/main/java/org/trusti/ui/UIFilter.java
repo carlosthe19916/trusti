@@ -1,5 +1,6 @@
 package org.trusti.ui;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+@RegisterForReflection
 @WebFilter(urlPatterns = "/*")
 public class UIFilter extends HttpFilter {
 

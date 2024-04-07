@@ -12,7 +12,7 @@ RUN ./mvnw -B org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offline
 COPY server/src/main /code/server/src/main
 COPY importer/src/main /code/importer/src/main
 COPY importer-cli/src/main /code/importer-cli/src/main
-COPY ui/src/main /code/ui/src/main
+COPY ui/ /code/ui/
 RUN ./mvnw install -DskipTests && ./mvnw package -Dnative -DskipTests -pl importer
 
 FROM quay.io/quarkus/quarkus-micro-image:2.0
