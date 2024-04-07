@@ -13,7 +13,7 @@ import {
   Task,
 } from "./models";
 
-const HUB = "/hub";
+const HUB = "/api";
 
 export const ADVISORIES = HUB + "/advisories";
 export const CVES = HUB + "/cves";

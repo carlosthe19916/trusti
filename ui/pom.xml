@@ -109,6 +109,25 @@
                     </resources>
                   </configuration>
                 </execution>
+                <execution>
+                  <id>copy-resources-index</id>
+                  <phase>generate-resources</phase>
+                  <goals>
+                    <goal>copy-resources</goal>
+                  </goals>
+                  <configuration>
+                    <outputDirectory>${project.parent.basedir}/server/src/main/resources/templates</outputDirectory>
+                    <resources>
+                      <resource>
+                        <directory>client/dist</directory>
+                        <filtering>false</filtering>
+                        <includes>
+                          <include>*.ejs</include>
+                        </includes>
+                      </resource>
+                    </resources>
+                  </configuration>
+                </execution>
               </executions>
             </plugin>
           </plugins>

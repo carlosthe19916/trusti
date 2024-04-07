@@ -34,7 +34,7 @@ export type TrustiEnvType = {
   /** Target URL for the UI server's `/auth` proxy */
   OIDC_SERVER_URL?: string;
 
-  /** Target URL for the UI server's `/hub` proxy */
+  /** Target URL for the UI server's `/api` proxy */
   TRUSTIFICATION_HUB_URL?: string;
 
   /** Location of branding files (relative paths computed from the project source root) */

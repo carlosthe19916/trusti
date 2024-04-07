@@ -13,7 +13,6 @@
     <artifactId>trusti-importer</artifactId>
 
     <properties>
-
     </properties>
     <dependencyManagement>
         <dependencies>
