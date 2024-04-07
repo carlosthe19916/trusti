@@ -5,12 +5,14 @@ COPY --chown=quarkus:quarkus pom.xml /code/
 COPY --chown=quarkus:quarkus server/pom.xml /code/server/
 COPY --chown=quarkus:quarkus importer/pom.xml /code/importer/
 COPY --chown=quarkus:quarkus importer-cli/pom.xml /code/importer-cli/
+COPY --chown=quarkus:quarkus ui/pom.xml /code/ui/
 USER quarkus
 WORKDIR /code
 RUN ./mvnw -B org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offline
 COPY server/src/main /code/server/src/main
 COPY importer/src/main /code/importer/src/main
 COPY importer-cli/src/main /code/importer-cli/src/main
+COPY ui/src/main /code/ui/src/main
 RUN ./mvnw install -DskipTests && ./mvnw package -Dnative -DskipTests -pl importer
 
 FROM quay.io/quarkus/quarkus-micro-image:2.0
